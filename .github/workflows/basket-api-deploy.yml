@@ -32,3 +32,4 @@ jobs:
           chart: ${{ env.CHART }}
           chart_root: ${{ env.CHART_ROOT }}
           namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
