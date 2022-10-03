@@ -23,6 +23,9 @@ inputs:
   namespace:
     description: "Namespace to deploy to"
     required: true
+  dns:
+    description: "Specifies the external DNS/ IP address of the Kubernetes cluster."
+    required: true
 
 runs:
   using: "composite"
@@ -48,7 +51,7 @@ runs:
   - name: Deploy Chart
     shell: bash
     run: |
-      ./deploy-chart.sh -c ${{ inputs.chart }} --dns ${{ secrets.API_server_address }} --aks-name ${{ inputs.clusteR_name }} --aks-rg ${{ inputs.resource_group }} -r ${{ inputs.registry_host }} -t $TAG --namespace ${{ inputs.namespace }} --acr-connected
+      ./deploy-chart.sh -c ${{ inputs.chart }} --dns ${{ inputs.dns }} --aks-name ${{ inputs.clusteR_name }} --aks-rg ${{ inputs.resource_group }} -r ${{ inputs.registry_host }} -t $TAG --namespace ${{ inputs.namespace }} --acr-connected
     env:
       TAG: ${{ env.BRANCH }}
     working-directory: ${{ inputs.chart_root }}
