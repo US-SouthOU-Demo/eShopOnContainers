@@ -17,10 +17,9 @@ env:
 
 jobs:
   deploy-to-k8s:
-    #if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    if: false
-    runs-on: ubuntu-latest
-
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux]
+    
     steps:
       - uses: actions/checkout@v2
 
@@ -33,3 +32,4 @@ jobs:
           chart: ${{ env.CHART }}
           chart_root: ${{ env.CHART_ROOT }}
           namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }}
