@@ -1,0 +1,85 @@
+name: Deploy eShop Infrastructure Containers
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+    - deploy
+  workflow_run:
+    workflows: ["eshop-infrastructure"]
+    branches: [dev]
+    types: [completed]
+
+env:
+  NAMESPACE: eshop
+  CHART_ROOT: deploy/k8s/helm
+
+jobs:
+  deploy-to-k8s:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+
+      - name: deploy sql-data
+        uses: ./.github/workflows/composite/deploy-helm
+        with:
+          chart: sql-data
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster_name: ${{ secrets.CLUSTER_NAME }}
+          resource_group: ${{ secrets.RESOURCE_GROUP }}
+          registry_host: ${{ secrets.REGISTRY_HOST }}
+          chart_root: ${{ env.CHART_ROOT }}
+          namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
+
+      - name: deploy nosql-data
+        uses: ./.github/workflows/composite/deploy-helm
+        with:
+          chart: nosql-data
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster_name: ${{ secrets.CLUSTER_NAME }}
+          resource_group: ${{ secrets.RESOURCE_GROUP }}
+          registry_host: ${{ secrets.REGISTRY_HOST }}
+          chart_root: ${{ env.CHART_ROOT }}
+          namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
+          
+      - name: deploy rabbitmq
+        uses: ./.github/workflows/composite/deploy-helm
+        with:
+          chart: rabbitmq
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster_name: ${{ secrets.CLUSTER_NAME }}
+          resource_group: ${{ secrets.RESOURCE_GROUP }}
+          registry_host: ${{ secrets.REGISTRY_HOST }}
+          chart_root: ${{ env.CHART_ROOT }}
+          namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
+          
+      - name: deploy keystore-data
+        uses: ./.github/workflows/composite/deploy-helm
+        with:
+          chart: keystore-data
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster_name: ${{ secrets.CLUSTER_NAME }}
+          resource_group: ${{ secrets.RESOURCE_GROUP }}
+          registry_host: ${{ secrets.REGISTRY_HOST }}
+          chart_root: ${{ env.CHART_ROOT }}
+          namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
+
+      - name: deploy basket-data
+        uses: ./.github/workflows/composite/deploy-helm
+        with:
+          chart: basket-data
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster_name: ${{ secrets.CLUSTER_NAME }}
+          resource_group: ${{ secrets.RESOURCE_GROUP }}
+          registry_host: ${{ secrets.REGISTRY_HOST }}
+          chart_root: ${{ env.CHART_ROOT }}
+          namespace: ${{ env.NAMESPACE }}
+          dns: ${{ secrets.API_server_address }} 
+          
