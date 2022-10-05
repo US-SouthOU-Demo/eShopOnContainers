@@ -7,7 +7,7 @@ on:
     - deploy
   workflow_run:
     workflows: ["eshop-infrastructure"]
-    branches: [dev]
+    branches: [latest]
     types: [completed]
 
 env:
