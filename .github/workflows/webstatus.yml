@@ -38,7 +38,7 @@ jobs:
         registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
 
   BuildLinux:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     if: ${{ github.event_name != 'pull_request' }}
     steps:
     - name: Checkout code
