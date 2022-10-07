@@ -1,4 +1,4 @@
-name: Deploy eShop Infrastructure Containers
+name: Deploy Infrastructure
 
 on:
   workflow_dispatch:
