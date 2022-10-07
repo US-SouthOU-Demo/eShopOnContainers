@@ -22,64 +22,46 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout
+        
+      - uses: azure/login@v1
+        with:
+          creds: ${{ inputs.azure_credentials }}
+        
+      - uses: azure/aks-set-context@v1
+        name: Set AKS context
+        with:
+          creds: '${{ inputs.azure_credentials }}'
+          cluster-name: ${{ inputs.cluster_name }}
+          resource-group: ${{ inputs.resource_group }}
+  
+      - name: Set branch name as env variable
+        shell: bash
+        run: |
+          currentbranch=$(echo ${GITHUB_REF##*/})
+          echo "running on $currentbranch"
+          echo "BRANCH=$currentbranch" >> $GITHUB_ENV
 
       - name: deploy sql-data
-        uses: ./.github/workflows/composite/deploy-helm
-        with:
-          chart: sql-data
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster_name: ${{ secrets.CLUSTER_NAME }}
-          resource_group: ${{ secrets.RESOURCE_GROUP }}
-          registry_host: ${{ secrets.REGISTRY_HOST }}
-          chart_root: ${{ env.CHART_ROOT }}
-          namespace: ${{ env.NAMESPACE }}
-          dns: ${{ secrets.API_server_address }} 
-
-      - name: deploy nosql-data
-        uses: ./.github/workflows/composite/deploy-helm
-        with:
-          chart: nosql-data
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster_name: ${{ secrets.CLUSTER_NAME }}
-          resource_group: ${{ secrets.RESOURCE_GROUP }}
-          registry_host: ${{ secrets.REGISTRY_HOST }}
-          chart_root: ${{ env.CHART_ROOT }}
-          namespace: ${{ env.NAMESPACE }}
-          dns: ${{ secrets.API_server_address }} 
-          
-      - name: deploy rabbitmq
-        uses: ./.github/workflows/composite/deploy-helm
-        with:
-          chart: rabbitmq
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster_name: ${{ secrets.CLUSTER_NAME }}
-          resource_group: ${{ secrets.RESOURCE_GROUP }}
-          registry_host: ${{ secrets.REGISTRY_HOST }}
-          chart_root: ${{ env.CHART_ROOT }}
-          namespace: ${{ env.NAMESPACE }}
-          dns: ${{ secrets.API_server_address }} 
-          
-      - name: deploy keystore-data
-        uses: ./.github/workflows/composite/deploy-helm
-        with:
-          chart: keystore-data
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster_name: ${{ secrets.CLUSTER_NAME }}
-          resource_group: ${{ secrets.RESOURCE_GROUP }}
-          registry_host: ${{ secrets.REGISTRY_HOST }}
-          chart_root: ${{ env.CHART_ROOT }}
-          namespace: ${{ env.NAMESPACE }}
-          dns: ${{ secrets.API_server_address }} 
-
-      - name: deploy basket-data
-        uses: ./.github/workflows/composite/deploy-helm
-        with:
-          chart: basket-data
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          cluster_name: ${{ secrets.CLUSTER_NAME }}
-          resource_group: ${{ secrets.RESOURCE_GROUP }}
-          registry_host: ${{ secrets.REGISTRY_HOST }}
-          chart_root: ${{ env.CHART_ROOT }}
-          namespace: ${{ env.NAMESPACE }}
-          dns: ${{ secrets.API_server_address }} 
-          
+        shell: bash
+        working-directory: ./eShopOnContainers/deploy/k8s/helm/sql-data
+        run: |
+          helm install "eshop-sql-data" \
+          --namespace ${{ env.NAMESPACE }} \
+          --set "${{ secrets.API_server_address }}" \
+          --values app.yaml \
+          --values inf.yaml \
+          --values "ingress_values.yaml" \
+          --values "ingress_values_linkerd.yaml" \
+          --set app.name='eshop' \
+          --set inf.k8s.dns="${{ secrets.API_server_address }}" \
+          sql-data \
+          --set inf.mesh.enabled=$use_mesh
+        #env:
+          #chart: sql-data
+          #azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          #cluster_name: ${{ secrets.CLUSTER_NAME }}
+          #resource_group: ${{ secrets.RESOURCE_GROUP }}
+          #registry_host: ${{ secrets.REGISTRY_HOST }}
+          #chart_root: ${{ env.CHART_ROOT }}
+          #namespace: ${{ env.NAMESPACE }}
+          #dns: ${{ secrets.API_server_address }}
