@@ -32,11 +32,6 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout
         
-      - name: File test
-        shell: bash
-        run: |
-         cat ./deploy/k8s/helm/sql-data/Chart.yaml
-        
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -57,7 +52,7 @@ jobs:
 
       - name: deploy sql-data
         shell: bash
-        working-directory: ./deploy/k8s/helm/sql-data/
+        working-directory: ./deploy/k8s/helm/
         run: |
           helm install "eshop-sql-data" \
           --namespace ${{ env.NAMESPACE }} \
