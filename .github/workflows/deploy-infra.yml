@@ -2,6 +2,15 @@ name: Deploy Infrastructure
 
 on:
   workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Name of AKS Cluster'
+        required: true
+        default: 'eslzakscluster'
+      resource_group:
+        description: 'Resource Group of AKS Cluster'
+        required: true
+        default: 'ESLZ-SPOKE'
   repository_dispatch:
     types:
     - deploy
@@ -25,12 +34,12 @@ jobs:
         
       - uses: azure/login@v1
         with:
-          creds: ${{ inputs.azure_credentials }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
         
       - uses: azure/aks-set-context@v1
         name: Set AKS context
         with:
-          creds: '${{ inputs.azure_credentials }}'
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
           cluster-name: ${{ inputs.cluster_name }}
           resource-group: ${{ inputs.resource_group }}
   
