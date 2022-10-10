@@ -52,7 +52,7 @@ jobs:
 
       - name: deploy sql-data
         shell: bash
-        working-directory: ./eShopOnContainers/deploy/k8s/helm/sql-data
+        working-directory: /deploy/k8s/helm/sql-data
         run: |
           helm install "eshop-sql-data" \
           --namespace ${{ env.NAMESPACE }} \
