@@ -1,0 +1,62 @@
+name: Deploy Apps
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Name of AKS Cluster'
+        required: true
+        default: 'eslzakscluster'
+      resource_group:
+        description: 'Resource Group of AKS Cluster'
+        required: true
+        default: 'ESLZ-SPOKE'
+  repository_dispatch:
+    types:
+    - deploy
+  workflow_run:
+    workflows: ["eshop-infrastructure"]
+    branches: [latest]
+    types: [completed]
+
+env:
+  NAMESPACE: eshop
+  CHART_ROOT: deploy/k8s/helm
+  image_tag: latest
+
+jobs:
+  deploy-to-k8s:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - uses: azure/aks-set-context@v1
+        name: Set AKS context
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          cluster-name: ${{ inputs.cluster_name }}
+          resource-group: ${{ inputs.resource_group }}
+  
+      - name: Set branch name as env variable
+        shell: bash
+        run: |
+          currentbranch=$(echo ${GITHUB_REF##*/})
+          echo "running on $currentbranch"
+          echo "BRANCH=$currentbranch" >> $GITHUB_ENV
+
+#eshop-common catalog-api identity-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web
+
+      - name: deploy basket-api
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-basket-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ env.image_tag }} --set image.pullPolicy='Always' basket-api --set inf.mesh.enabled=false
+          
+
