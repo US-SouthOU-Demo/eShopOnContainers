@@ -55,8 +55,28 @@ jobs:
         working-directory: ./deploy/k8s/helm/
         run: |
           helm upgrade -i "eshop-sql-data" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" sql-data --set inf.mesh.enabled=false
+
+      - name: deploy nosql-data
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
           helm upgrade -i "eshop-nosql-data" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" nosql-data --set inf.mesh.enabled=false
-          helm upgrade -i "eshop-rabbitmq-data" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" rabbitmq --set inf.mesh.enabled=false
+
+      - name: deploy rabbitmq
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-rabbitmq" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" rabbitmq --set inf.mesh.enabled=false
+
+      - name: deploy keystore-data
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
           helm upgrade -i "eshop-keystore-data" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" keystore-data --set inf.mesh.enabled=false
+
+      - name: deploy basket-data
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
           helm upgrade -i "eshop-basket-data" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml" --set app.name='eshop' --set inf.k8s.dns="${{ secrets.API_server_address }}" basket-data --set inf.mesh.enabled=false
           
