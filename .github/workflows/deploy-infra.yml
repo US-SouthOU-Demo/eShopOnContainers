@@ -54,7 +54,7 @@ jobs:
         shell: bash
         working-directory: ./deploy/k8s/helm/
         run: |
-          helm install "eshop-sql-data" \
+          helm upgrade -i "eshop-sql-data" \
           --namespace ${{ env.NAMESPACE }} \
           --set "ingress.hosts=${{ secrets.API_server_address }}" \
           --values app.yaml \
