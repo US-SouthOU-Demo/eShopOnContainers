@@ -56,7 +56,7 @@ jobs:
         run: |
           helm install "eshop-sql-data" \
           --namespace ${{ env.NAMESPACE }} \
-          --set "${{ secrets.API_server_address }}" \
+          --set "ingress.hosts=${{ secrets.API_server_address }}"
           --values app.yaml \
           --values inf.yaml \
           --values "ingress_values.yaml" \
@@ -64,7 +64,7 @@ jobs:
           --set app.name='eshop' \
           --set inf.k8s.dns="${{ secrets.API_server_address }}" \
           sql-data \
-          --set inf.mesh.enabled=$use_mesh
+          --set inf.mesh.enabled=false
         #env:
           #chart: sql-data
           #azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
