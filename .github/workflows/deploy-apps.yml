@@ -11,6 +11,10 @@ on:
         description: 'Resource Group of AKS Cluster'
         required: true
         default: 'ESLZ-SPOKE'
+      image_tag:
+        description: 'Container image tag'
+        required: true
+        default: 'linux-dev'
   repository_dispatch:
     types:
     - deploy
@@ -22,7 +26,6 @@ on:
 env:
   NAMESPACE: eshop
   CHART_ROOT: deploy/k8s/helm
-  image_tag: latest
 
 jobs:
   deploy-to-k8s:
@@ -51,12 +54,93 @@ jobs:
           echo "running on $currentbranch"
           echo "BRANCH=$currentbranch" >> $GITHUB_ENV
 
-#eshop-common catalog-api identity-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web
-
+      - name: deploy eshop-common
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-eshop-common" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' eshop-common --set inf.mesh.enabled=false
+          
       - name: deploy basket-api
         shell: bash
         working-directory: ./deploy/k8s/helm/
         run: |
-          helm upgrade -i "eshop-basket-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ env.image_tag }} --set image.pullPolicy='Always' basket-api --set inf.mesh.enabled=false
+          helm upgrade -i "eshop-basket-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' basket-api --set inf.mesh.enabled=false
           
+      - name: deploy catalog-api
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-catalog-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' catalog-api --set inf.mesh.enabled=false
+          
+      - name: deploy identity-api
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-identity-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' identity-api --set inf.mesh.enabled=false
+          
+      - name: deploy mobileshoppingagg
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-mobileshoppingagg" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' mobileshoppingagg --set inf.mesh.enabled=false
+          
+      - name: deploy ordering-api
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-ordering-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' ordering-api --set inf.mesh.enabled=false
+          
+      - name: deploy ordering-backgroundtasks
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-ordering-backgroundtasks" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' ordering-backgroundtasks --set inf.mesh.enabled=false
+          
+      - name: deploy ordering-signalrhub
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-ordering-signalrhub" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' ordering-signalrhub --set inf.mesh.enabled=false
+          
+      - name: deploy payment-api
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-payment-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' payment-api --set inf.mesh.enabled=false
+          
+      - name: deploy webmvc
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webmvc" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webmvc --set inf.mesh.enabled=false
+          
+      - name: deploy webshoppingagg
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webshoppingagg" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webshoppingagg --set inf.mesh.enabled=false
+          
+      - name: deploy webspa
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webspa" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webspa --set inf.mesh.enabled=false
+          
+      - name: deploy webstatus
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webstatus" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webstatus --set inf.mesh.enabled=false
+          
+      - name: deploy webhooks
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webhooks" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webhooks --set inf.mesh.enabled=false
+          
+      - name: deploy webhooks-web
+        shell: bash
+        working-directory: ./deploy/k8s/helm/
+        run: |
+          helm upgrade -i "eshop-webhooks-web" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=${{ secrets.API_server_address }}" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.API_server_address }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' webhooks-web --set inf.mesh.enabled=false
 
