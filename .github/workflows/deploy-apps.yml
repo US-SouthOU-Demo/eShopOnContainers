@@ -76,7 +76,7 @@ jobs:
         shell: bash
         working-directory: ./deploy/k8s/helm/
         run: |
-          helm upgrade -i "eshop-identity-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=e-shop-identity-api.${{ secrets.CUSTOM_DOMAIN_NAME }},e-shop-identity-api" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.CUSTOM_DOMAIN_NAME }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' identity-api --set inf.mesh.enabled=false
+          helm upgrade -i "eshop-identity-api" --namespace ${{ env.NAMESPACE }} --set "ingress.hosts=[e-shop-identity-api.${{ secrets.CUSTOM_DOMAIN_NAME }}]" --set inf.registry.server=${{ secrets.REGISTRY_HOST }} --set inf.registry.login=${{ secrets.USERNAME }} --set inf.registry.pwd=${{ secrets.PASSWORD }} --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values "ingress_values.yaml" --values "ingress_values_linkerd.yaml"  --set app.name=eshop --set inf.k8s.dns="${{ secrets.CUSTOM_DOMAIN_NAME }}" --set image.tag=${{ inputs.image_tag }} --set image.pullPolicy='Always' identity-api --set inf.mesh.enabled=false
           
       - name: deploy mobileshoppingagg
         shell: bash
