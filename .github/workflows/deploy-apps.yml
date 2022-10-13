@@ -71,85 +71,85 @@ jobs:
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall basket-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-basket-api
       - name: Delete catalog-api
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall catalog-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-catalog-api
       - name: Delete identity-api
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall identity-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-identity-api
       - name: Delete mobileshoppingagg
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall mobileshoppingagg
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-mobileshoppingagg
       - name: Delete ordering-api
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-ordering-api
       - name: Delete ordering-backgroundtasks
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-backgroundtasks
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-ordering-backgroundtasks
       - name: Delete ordering-signalrhub
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-signalrhub
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-ordering-signalrhub
       - name: Delete payment-api
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall payment-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-payment-api
       - name: Delete webmvc
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webmvc
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webmvc
       - name: Delete webshoppingagg
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webshoppingagg
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webshoppingagg
       - name: Delete webspa
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webspa
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webspa
       - name: Delete webstatus
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webstatus
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webstatus
       - name: Delete webhooks-api
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webhooks-api
       - name: Delete webhooks-web
         shell: bash
         if: ${{ inputs.delete_all }}
         continue-on-error: true
         run: |
-          helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-web
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-webhooks-web
           
       - name: deploy eshop-common
         shell: bash
