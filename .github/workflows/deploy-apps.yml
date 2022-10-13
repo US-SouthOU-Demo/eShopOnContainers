@@ -60,23 +60,89 @@ jobs:
           echo "BRANCH=$currentbranch" >> $GITHUB_ENV
         
         
-      - name: Delete Existing Deployments
+      - name: Delete eshop-common
         shell: bash
         if: ${{ inputs.delete_all }}
+        continue-on-error: true
         run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall eshop-common
+      - name: Delete basket-api
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall basket-api
+      - name: Delete catalog-api
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall catalog-api
+      - name: Delete identity-api
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall identity-api
+      - name: Delete mobileshoppingagg
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall mobileshoppingagg
+      - name: Delete ordering-api
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall ordering-api
+      - name: Delete ordering-backgroundtasks
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall ordering-backgroundtasks
+      - name: Delete ordering-signalrhub
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall ordering-signalrhub
+      - name: Delete webmvc
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall payment-api webmvc
+      - name: Delete webshoppingagg
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall webshoppingagg
+      - name: Delete webspa
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall webspa
+      - name: Delete webstatus
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall webstatus
+      - name: Delete webhooks-api
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-api
+      - name: Delete webhooks-web
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        continue-on-error: true
+        run: |
           helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-web
           
       - name: deploy eshop-common
