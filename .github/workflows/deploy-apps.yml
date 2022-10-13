@@ -15,6 +15,11 @@ on:
         description: 'Container image tag'
         required: true
         default: 'linux-dev'
+      delete_all:
+        description: 'Delete Existing Charts first?'
+        required: true
+        type: boolean
+        default: true
   repository_dispatch:
     types:
     - deploy
@@ -53,7 +58,27 @@ jobs:
           currentbranch=$(echo ${GITHUB_REF##*/})
           echo "running on $currentbranch"
           echo "BRANCH=$currentbranch" >> $GITHUB_ENV
-
+        
+        
+      - name: Delete Existing Deployments
+        shell: bash
+        if: ${{ inputs.delete_all }}
+        run: |
+          helm --namespace ${{ env.NAMESPACE }} uninstall eshop-common
+          helm --namespace ${{ env.NAMESPACE }} uninstall basket-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall catalog-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall identity-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall mobileshoppingagg
+          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-backgroundtasks
+          helm --namespace ${{ env.NAMESPACE }} uninstall ordering-signalrhub
+          helm --namespace ${{ env.NAMESPACE }} uninstall payment-api webmvc
+          helm --namespace ${{ env.NAMESPACE }} uninstall webshoppingagg
+          helm --namespace ${{ env.NAMESPACE }} uninstall webspa
+          helm --namespace ${{ env.NAMESPACE }} uninstall webstatus
+          helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-api
+          helm --namespace ${{ env.NAMESPACE }} uninstall webhooks-web
+          
       - name: deploy eshop-common
         shell: bash
         working-directory: ./deploy/k8s/helm/
