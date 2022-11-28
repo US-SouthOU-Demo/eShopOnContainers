@@ -1,0 +1,26 @@
+name: Deploy Basket API to Azure Container App
+ 
+on: 
+  push: 
+    branches: 
+      - main 
+ 
+jobs: 
+  build: 
+    runs-on: ubuntu-latest 
+ 
+    steps: 
+      - uses: actions/checkout@v3 
+ 
+      - name: Log in to Azure 
+        uses: azure/login@v1 
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }} 
+ 
+      - name: Build and deploy Container App 
+        uses: azure/container-apps-deploy-action@v0 
+        with: 
+          appSourcePath: ${{ github.workspace }}/src/Services/Basket/Basket.API
+          acrName: cloudycontainerregisty 
+          containerAppName: cloudy-container-apps
+          resourceGroup: ESLZ-SPOKE 
