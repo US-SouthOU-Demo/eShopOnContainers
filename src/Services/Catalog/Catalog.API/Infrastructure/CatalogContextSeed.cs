@@ -1,6 +1,4 @@
-﻿using Microsoft.eShopOnContainers.Services.Catalog.API.Model;
-
-namespace Microsoft.eShopOnContainers.Services.Catalog.API.Infrastructure;
+﻿namespace Microsoft.eShopOnContainers.Services.Catalog.API.Infrastructure;
 
 public class CatalogContextSeed
 {
@@ -318,7 +316,7 @@ public class CatalogContextSeed
 
         if (csvheaders.Count() < requiredHeaders.Count())
         {
-            throw new Exception($"requiredHeader count '{ requiredHeaders.Count()}' is bigger then csv header count '{csvheaders.Count()}' ");
+            throw new Exception($"requiredHeader count '{requiredHeaders.Count()}' is bigger then csv header count '{csvheaders.Count()}' ");
         }
 
         if (optionalHeaders != null)

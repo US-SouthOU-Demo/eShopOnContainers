@@ -1,6 +1,5 @@
 ﻿global using Autofac.Extensions.DependencyInjection;
 global using Autofac;
-global using Devspaces.Support;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
@@ -11,7 +10,6 @@ global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore;
-global using Azure.Messaging.ServiceBus;
 global using Microsoft.EntityFrameworkCore.Design;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;

@@ -1,5 +1,4 @@
 ﻿global using CatalogApi;
-global using Devspaces.Support;
 global using Grpc.Core.Interceptors;
 global using Grpc.Core;
 global using GrpcBasket;
@@ -39,3 +38,4 @@ global using System.Text.Json;
 global using System.Threading.Tasks;
 global using System.Threading;
 global using System;
+global using Microsoft.IdentityModel.Tokens;

@@ -17,7 +17,6 @@ public class Startup
             .AddCustomDbContext(Configuration)
             .AddSwagger(Configuration)
             .AddCustomHealthCheck(Configuration)
-            .AddDevspaces()
             .AddHttpClientServices(Configuration)
             .AddIntegrationServices(Configuration)
             .AddEventBus(Configuration)
@@ -34,7 +33,7 @@ public class Startup
     }
 
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
-    {        
+    {
         var pathBase = Configuration["PATH_BASE"];
 
         if (!string.IsNullOrEmpty(pathBase))
@@ -65,7 +64,7 @@ public class Startup
         app.UseSwagger()
             .UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Webhooks.API V1");
+                c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Webhooks.API V1");
                 c.OAuthClientId("webhooksswaggerui");
                 c.OAuthAppName("WebHooks Service Swagger UI");
             });
@@ -138,7 +137,7 @@ internal static class CustomExtensionMethods
     public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSwaggerGen(options =>
-        {            
+        {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "eShopOnContainers - Webhooks HTTP API",
@@ -175,13 +174,12 @@ internal static class CustomExtensionMethods
             services.AddSingleton<IEventBus, EventBusServiceBus>(sp =>
             {
                 var serviceBusPersisterConnection = sp.GetRequiredService<IServiceBusPersisterConnection>();
-                var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                 var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                 var eventBusSubscriptionManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
                 string subscriptionName = configuration["SubscriptionClientName"];
 
                 return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                    eventBusSubscriptionManager, iLifetimeScope, subscriptionName);
+                    eventBusSubscriptionManager, sp, subscriptionName);
             });
 
         }
@@ -191,7 +189,6 @@ internal static class CustomExtensionMethods
             {
                 var subscriptionClientName = configuration["SubscriptionClientName"];
                 var rabbitMQPersistentConnection = sp.GetRequiredService<IRabbitMQPersistentConnection>();
-                var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                 var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                 var eventBusSubscriptionManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
 
@@ -201,7 +198,7 @@ internal static class CustomExtensionMethods
                     retryCount = int.Parse(configuration["EventBusRetryCount"]);
                 }
 
-                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubscriptionManager, subscriptionClientName, retryCount);
+                return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, sp, eventBusSubscriptionManager, subscriptionClientName, retryCount);
             });
         }
 
@@ -233,8 +230,7 @@ internal static class CustomExtensionMethods
         services.AddHttpClient("extendedhandlerlifetime").SetHandlerLifetime(Timeout.InfiniteTimeSpan);
         //add http client services
         services.AddHttpClient("GrantClient")
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-                .AddDevspacesSupport();
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
         return services;
     }
 
@@ -243,47 +239,47 @@ internal static class CustomExtensionMethods
         services.AddTransient<Func<DbConnection, IIntegrationEventLogService>>(
                 sp => (DbConnection c) => new IntegrationEventLogService(c));
 
-            if (configuration.GetValue<bool>("AzureServiceBusEnabled"))
+        if (configuration.GetValue<bool>("AzureServiceBusEnabled"))
+        {
+            services.AddSingleton<IServiceBusPersisterConnection>(sp =>
             {
-                services.AddSingleton<IServiceBusPersisterConnection>(sp =>
-                {
-                    var subscriptionClientName = configuration["SubscriptionClientName"];
-                    return new DefaultServiceBusPersisterConnection(configuration["EventBusConnection"]);
-                });
-            }
-            else
+                var subscriptionClientName = configuration["SubscriptionClientName"];
+                return new DefaultServiceBusPersisterConnection(configuration["EventBusConnection"]);
+            });
+        }
+        else
+        {
+            services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
             {
-                services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
+                var logger = sp.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+
+                var factory = new ConnectionFactory()
                 {
-                    var logger = sp.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+                    HostName = configuration["EventBusConnection"],
+                    DispatchConsumersAsync = true
+                };
 
-                    var factory = new ConnectionFactory()
-                    {
-                        HostName = configuration["EventBusConnection"],
-                        DispatchConsumersAsync = true
-                    };
+                if (!string.IsNullOrEmpty(configuration["EventBusUserName"]))
+                {
+                    factory.UserName = configuration["EventBusUserName"];
+                }
 
-                    if (!string.IsNullOrEmpty(configuration["EventBusUserName"]))
-                    {
-                        factory.UserName = configuration["EventBusUserName"];
-                    }
+                if (!string.IsNullOrEmpty(configuration["EventBusPassword"]))
+                {
+                    factory.Password = configuration["EventBusPassword"];
+                }
 
-                    if (!string.IsNullOrEmpty(configuration["EventBusPassword"]))
-                    {
-                        factory.Password = configuration["EventBusPassword"];
-                    }
+                var retryCount = 5;
+                if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
+                {
+                    retryCount = int.Parse(configuration["EventBusRetryCount"]);
+                }
 
-                    var retryCount = 5;
-                    if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
-                    {
-                        retryCount = int.Parse(configuration["EventBusRetryCount"]);
-                    }
+                return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
+            });
+        }
 
-                    return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
-                });
-            }
-
-            return services;
+        return services;
     }
 
     public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -303,8 +299,23 @@ internal static class CustomExtensionMethods
             options.Authority = identityUrl;
             options.RequireHttpsMetadata = false;
             options.Audience = "webhooks";
+            options.TokenValidationParameters.ValidateAudience = false;
         });
 
+        return services;
+    }
+
+
+    public static IServiceCollection AddCustomAuthorization(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("ApiScope", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim("scope", "webhooks");
+            });
+        });
         return services;
     }
 }
